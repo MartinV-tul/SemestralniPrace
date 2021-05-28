@@ -26,8 +26,8 @@ public class TownTest {
     @Autowired
     private TownService townService;
 
-    private static Country country1 = new Country(1,"Česká Republika");
-    private static Country country2 = new Country(2,"Slovensko");
+    private static Country country1 = new Country("CZ","Česká Republika");
+    private static Country country2 = new Country("SK","Slovensko");
 
     private Town town1 = new Town(1,"Praha",country1);
     private Town town2 = new Town(2,"Brno",country1);
@@ -55,9 +55,9 @@ public class TownTest {
 
         List<Town> towns1 = townService.getTowns();
         assertEquals("Should be six retrieved towns.", 6, towns1.size());
-        List<Town> towns2 = townService.getTownsByCountry(country1);
+        List<Town> towns2 = townService.getTownsByCountryCode(country1.getCode());
         assertEquals("Should be three retrieved towns.", 3, towns2.size());
-        List<Town> towns3 = townService.getTownsByCountry(country2);
+        List<Town> towns3 = townService.getTownsByCountryCode(country2.getCode());
         assertEquals("Should be three retrieved towns.", 3, towns3.size());
 
         assertEquals("Should be country1.", country1, towns2.get(0).getCountry());
@@ -85,12 +85,12 @@ public class TownTest {
 
         List<Town> towns1 = townService.getTowns();
         assertEquals("Should be five retrieved towns.", 5, towns1.size());
-        List<Town> towns2 = townService.getTownsByCountry(country1);
+        List<Town> towns2 = townService.getTownsByCountryCode(country1.getCode());
         assertEquals("Should be three retrieved towns.", 3, towns2.size());
-        List<Town> towns3 = townService.getTownsByCountry(country2);
+        List<Town> towns3 = townService.getTownsByCountryCode(country2.getCode());
         assertEquals("Should be two retrieved towns.", 2, towns3.size());
 
-        countryService.deleteCountry(country2);
+        townService.deleteByCountryCode(country2.getCode());
         List<Town> towns4 = townService.getTowns();
         assertEquals("Should be three retrieved towns.", 3, towns4.size());
     }

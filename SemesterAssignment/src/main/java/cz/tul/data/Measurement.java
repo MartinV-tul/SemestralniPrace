@@ -108,7 +108,7 @@ public class Measurement {
     public Measurement(){
 
     }
-    public Measurement(Integer townId, Long ts, String main, String description, Float temperature, Float feelsLike, Float maximalTemperature, Float minimalTemperature, Integer pressure, Integer humidity, Float windSpeed, Integer windDegree) {
+    public Measurement(Integer townId, Long ts, String main, String description, Float temperature, Float feelsLike, Float maximalTemperature, Float minimalTemperature, Integer pressure, Integer humidity, Float windSpeed, Integer windDegree,String townName, String countryName) {
         this.townId = townId;
         this.ts = ts;
         this.main = main;
@@ -121,6 +121,8 @@ public class Measurement {
         this.humidity = humidity;
         this.windSpeed = windSpeed;
         this.windDegree = windDegree;
+        this.countryName = countryName;
+        this.townName = townName;
         this.id = createMeasurementId(townId,ts);
     }
 
@@ -131,6 +133,8 @@ public class Measurement {
     Long ts;
     String main;
     String description;
+    String townName;
+    String countryName;
     Float temperature;
     Float feelsLike;
     Float maximalTemperature;

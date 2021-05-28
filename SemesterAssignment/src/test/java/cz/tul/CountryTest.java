@@ -29,8 +29,8 @@ public class CountryTest {
     @Autowired
     private TownService townService;
 
-    private Country country1 = new Country(1,"Česká Republika");
-    private Country country2 = new Country(2,"Slovensko");
+    private Country country1 = new Country("CZ","Česká Republika");
+    private Country country2 = new Country("SK","Slovensko");
 
 
     @Before
@@ -58,7 +58,7 @@ public class CountryTest {
         townService.create(town5);
         townService.create(town6);
 
-        List<Town> towns = townService.getTownsByCountry(country1);
+        List<Town> towns = townService.getTownsByCountryCode(country1.getCode());
         System.out.println(towns);
 
         countryService.deleteCountry(country2);

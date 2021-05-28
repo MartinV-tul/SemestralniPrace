@@ -27,7 +27,7 @@ public class Town implements Serializable {
 
 
     @ManyToOne
-    @JoinColumn(name = "country_id")
+    @JoinColumn(name = "country_code")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Country country;
 

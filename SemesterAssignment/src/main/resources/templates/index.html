@@ -3,20 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
 </head>
 <body>
-<h1>Ahoj</h1>
-<select name="Countries">
-    <option value="Linear" >Pohyb po přímce</option>
-    <option value="Circular1" >Pohyb po kružnici dané dvěma body a poloměrem</option>
-    <option value="Circular2" >Pohyb po kružnici dané třemi body</option>
-    <option value="Circular3" >Pohyb po kružnici dané středem a úhlem</option>
-</select>
-<select name="Towns">
-    <option value="Linear" >Pohyb po přímce</option>
-    <option value="Circular1" >Pohyb po kružnici dané dvěma body a poloměrem</option>
-    <option value="Circular2" >Pohyb po kružnici dané třemi body</option>
-    <option value="Circular3" >Pohyb po kružnici dané středem a úhlem</option>
-</select>
+<div align="center" class="container my-2">
+
+    <h1>Countries</h1>
+    <a th:href="@{/newCountryForm}" class="btn btn-primary btn-sm mb-2">Add country</a>
+    <table border="2" class = "table table-striped table-responsive-md">
+        <thead>
+        <tr>
+            <th>Country name</th>
+            <th>Country code</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="country : ${countries}">
+            <td th:text="${country.getCountryName()}"></td>
+            <td th:text="${country.getCode()}"></td>
+            <td style="text-align: center" ><a th:href="@{/showTownsOfCountry(code = ${country.code},name=${country.countryName})}"  class="btn btn-primary">Show towns</a> </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
 </body>
 </html>

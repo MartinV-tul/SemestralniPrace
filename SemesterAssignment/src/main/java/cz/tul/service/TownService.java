@@ -1,7 +1,6 @@
 package cz.tul.service;
 
 
-import cz.tul.data.Country;
 import cz.tul.data.Town;
 import cz.tul.repositories.TownRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +26,23 @@ public class TownService {
     }
 
 
-    public List<Town> getTownsByCountry(Country country){
-        if(country == null)return null;
+    public List<Town> getTownsByCountryCode(String countryCode){
+        if(countryCode == null)return null;
 
-        List<Town> towns = townRepository.findByCountryId(country.getId());
+        List<Town> towns = townRepository.findByCountryCode(countryCode);
         if(towns.size() == 0) return null;
 
         return towns;
+    }
+
+    public void deleteByCountryCode(String country_code){
+        if(country_code == null)return;
+
+        townRepository.deleteByCountryCode(country_code);
+    }
+
+    public boolean exists(Integer id){
+        return townRepository.existsById(id);
     }
 
     @Transactional

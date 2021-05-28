@@ -15,8 +15,8 @@ import java.util.List;
 @Repository
 public interface TownRepository extends CrudRepository<Town, Integer> {
 
-    @Query(value = "select * from town where country_id = ?1",nativeQuery = true)
-    public List<Town> findByCountryId(Integer country_id);
+    @Query(value = "select * from town where country_code = ?1",nativeQuery = true)
+    public List<Town> findByCountryCode(String country_code);
 
     @Transactional
     @Modifying
@@ -25,6 +25,6 @@ public interface TownRepository extends CrudRepository<Town, Integer> {
 
     @Transactional
     @Modifying
-    @Query("delete from Town as t where t.country.id=:country_id")
-    public void  deleteByCountryName(@Param("country_id") Integer country_id);
+    @Query(value = "delete from town where country_code = ?1",nativeQuery = true)
+    public void  deleteByCountryCode(@Param("country_code") String country_code);
 }

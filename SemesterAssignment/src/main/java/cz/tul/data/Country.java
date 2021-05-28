@@ -8,17 +8,17 @@ import java.util.List;
 @Table(name = "country")
 public class Country {
 
-    public Integer getId() {
-        return id;
+    public String getCode() {
+        return code;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     @Id
-    @Column(name = "id")
-    private Integer id;
+    @Column(name = "code")
+    private String code;
 
     @Column(name = "name")
     private String name;
@@ -36,8 +36,8 @@ public class Country {
         return towns;
     }
 
-    public Country(Integer id,String name){
-        this.id = id;
+    public Country(String code, String name){
+        this.code = code;
         this.name = name;
     }
 

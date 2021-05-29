@@ -56,6 +56,10 @@ public class Town implements Serializable {
         return country.getCountryName();
     }
 
+    public String getCountryCode(){
+        return  country.getCode();
+    }
+
     public void setCountry(Country country) {
         this.country = country;
     }

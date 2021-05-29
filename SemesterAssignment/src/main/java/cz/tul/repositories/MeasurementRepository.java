@@ -13,4 +13,6 @@ public interface MeasurementRepository extends MongoRepository<Measurement,Long>
     Measurement findFirstByTownIdOrderByTsDesc(int townId);
 
     void deleteAllByTownId(int townId);
+
+    void deleteAllByCountryCode(String countryCode);
 }

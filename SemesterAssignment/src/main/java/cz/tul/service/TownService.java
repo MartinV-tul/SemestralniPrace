@@ -21,28 +21,32 @@ public class TownService {
         return StreamSupport.stream(townRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
-    public void create(Town town){
+    public void saveOrUpdate(Town town){
         townRepository.save(town);
     }
 
 
-    public List<Town> getTownsByCountryCode(String countryCode){
-        if(countryCode == null)return null;
+    public List<Town> getTownsByCountryCode(String code){
+        if(code == null)return null;
 
-        List<Town> towns = townRepository.findByCountryCode(countryCode);
+        List<Town> towns = townRepository.findByCountryCode(code);
         if(towns.size() == 0) return null;
 
         return towns;
     }
 
-    public void deleteByCountryCode(String country_code){
-        if(country_code == null)return;
+    public void deleteByCountryCode(String code){
+        if(code == null)return;
 
-        townRepository.deleteByCountryCode(country_code);
+        townRepository.deleteByCountryCode(code);
     }
 
     public boolean exists(Integer id){
         return townRepository.existsById(id);
+    }
+
+    public void deleteTownById(Integer id){
+        townRepository.deleteTownById(id);
     }
 
     @Transactional

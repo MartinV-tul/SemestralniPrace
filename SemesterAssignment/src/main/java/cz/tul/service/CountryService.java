@@ -14,7 +14,7 @@ public class CountryService {
     @Autowired
     private CountryRepository countryRepository;
 
-    public void create(Country country){
+    public void saveOrUpdate(Country country){
         countryRepository.save(country);
     }
 
@@ -34,6 +34,10 @@ public class CountryService {
 
     public void deleteCountry(Country country){
         countryRepository.delete(country);
+    }
+
+    public void deleteCountryByCode(String code){
+        countryRepository.deleteById(code);
     }
 
     public void deleteAllCountries(){

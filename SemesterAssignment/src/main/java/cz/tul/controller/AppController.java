@@ -7,9 +7,8 @@ import cz.tul.data.Town;
 import cz.tul.service.CountryService;
 import cz.tul.service.MeasurementService;
 import cz.tul.service.TownService;
-import org.dom4j.rule.Mode;
+import cz.tul.thread.UpdateThread;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -37,6 +36,16 @@ public class AppController {
         return modelAndView;
     }
 
+    @GetMapping("/setUpdateTime")
+    public String setUpdateTime(@RequestParam Integer time){
+        if(time >=5000){
+            UpdateThread.updateTime = time;
+            return "Update time successfully set to: " + time+"ms.";
+        }
+        UpdateThread.updateTime = 5000;
+        return  "Update time lower than 5000ms is not allowed. Update time set to 5000ms.";
+    }
+
     @GetMapping("/newCountryForm")
     public ModelAndView newCountryForm(Model model){
         Country country = new Country();
@@ -57,11 +66,22 @@ public class AppController {
         return modelAndView;
     }
 
+    @GetMapping("/deleteCountry")
+    public ModelAndView deleteCountry(@RequestParam String code){
+        measurementService.deleteAllMeasurementsOfCountry(code);
+        countryService.deleteCountryByCode(code);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("redirect:/");
+        return modelAndView;
+    }
+
     @PostMapping("/saveCountry")
     public ModelAndView saveCountry(@ModelAttribute("country") Country country){
-        if(!countryService.exists(country.getCode())){
-            countryService.create(country);
+        if(countryService.exists(country.getCode())){
+            List<Town> towns = townService.getTownsByCountryCode(country.getCode());
+            country.setTowns(towns);
         }
+        countryService.saveOrUpdate(country);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("redirect:/");
         return modelAndView;
@@ -71,9 +91,19 @@ public class AppController {
     public ModelAndView saveTown(@ModelAttribute("town") Town town,@RequestParam String code, @RequestParam String countryName){
         Country country = new Country(code,countryName);
         town.setCountry(country);
-        if(!townService.exists(town.getId())){
-            townService.create(town);
+        if(townService.exists(town.getId())){
+            measurementService.updateTownNameOfMeasurement(town.getName(),town.getId());
         }
+        townService.saveOrUpdate(town);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("redirect:/showTownsOfCountry?code="+code+"&name="+countryName);
+        return modelAndView;
+    }
+
+    @GetMapping("/deleteTown")
+    public ModelAndView deleteTown(@RequestParam String code, @RequestParam String countryName, @RequestParam Integer townId){
+        townService.deleteTownById(townId);
+        measurementService.deleteAllMeasurementsOfTown(townId);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("redirect:/showTownsOfCountry?code="+code+"&name="+countryName);
         return modelAndView;

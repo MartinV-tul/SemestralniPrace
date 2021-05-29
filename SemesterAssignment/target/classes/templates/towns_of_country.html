@@ -12,7 +12,7 @@
 <div align="center" class="container my-2">
 
     <h1 th:text="${text}"></h1>
-    <a th:href="@{/newTownForm(code = ${code},countryName=${countryName})}" class="btn btn-primary btn-sm mb-2">Add town</a>
+    <a th:href="@{/newTownForm(code = ${code},countryName=${countryName})}" class="btn btn-primary btn-sm mb-2">Add or update town</a>
     <table border="2" class = "table table-striped table-responsive-md">
         <thead>
         <tr>
@@ -27,6 +27,7 @@
             <th>One day average temperature(°C)</th>
             <th>One week average temperature(°C)</th>
             <th>Two weeks average temperature(°C)</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -42,6 +43,7 @@
             <td th:text="${town.getOneDayAverageTemperature()}"></td>
             <td th:text="${town.getOneWeekAverageTemperature()}"></td>
             <td th:text="${town.getTwoWeeksAverageTemperature()}"></td>
+            <td style="text-align: center" ><a th:href="@{/deleteTown(code = ${code},countryName=${countryName},townId=${town.id})}"  class="btn btn-primary">Delete country</a> </td>
         </tr>
         </tbody>
     </table>

@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
-
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,8 +45,16 @@ public class MeasurementService {
         measurementRepository.deleteAllByTownId(townId);
     }
 
+    public void deleteAllMeasurementsOfCountry(String code){
+        measurementRepository.deleteAllByCountryCode(code);
+    }
+
     public void deleteMeasurement(Measurement measurement){
         measurementRepository.delete(measurement);
+    }
+
+    public void updateTownNameOfMeasurement(String townName,int townId){
+        mongoTemplate.updateMulti(new Query(Criteria.where("townId").is(townId)),Update.update("townName",townName),"measurement");
     }
 
     public List<Measurement> getAllMeasurements(){

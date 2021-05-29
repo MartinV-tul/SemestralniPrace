@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateThread extends Thread{
-    Integer updateTime = 5000;
+    public static Integer updateTime = 5000;
     boolean updateEnabled = true;
 
     public UpdateThread(TownService townService,MeasurementService measurementService){

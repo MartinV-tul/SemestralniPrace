@@ -1,6 +1,5 @@
 package cz.tul;
 
-import cz.tul.Main;
 import cz.tul.data.Country;
 import cz.tul.data.Town;
 import cz.tul.service.CountryService;
@@ -15,8 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {Main.class})
@@ -41,8 +38,8 @@ public class CountryTest {
 
     @Test
     public void testCreateCountry(){
-        countryService.create(country1);
-        countryService.create(country2);
+        countryService.saveOrUpdate(country1);
+        countryService.saveOrUpdate(country2);
 
         Town town1 = new Town(1,"Praha",country1);
         Town town2 = new Town(2,"Brno",country1);
@@ -51,12 +48,12 @@ public class CountryTest {
         Town town5 = new Town(5,"Kosice",country2);
         Town town6 = new Town(6,"Trencin",country2);
 
-        townService.create(town1);
-        townService.create(town2);
-        townService.create(town3);
-        townService.create(town4);
-        townService.create(town5);
-        townService.create(town6);
+        townService.saveOrUpdate(town1);
+        townService.saveOrUpdate(town2);
+        townService.saveOrUpdate(town3);
+        townService.saveOrUpdate(town4);
+        townService.saveOrUpdate(town5);
+        townService.saveOrUpdate(town6);
 
         List<Town> towns = townService.getTownsByCountryCode(country1.getCode());
         System.out.println(towns);

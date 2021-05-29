@@ -41,7 +41,7 @@ public class MeasurementTest {
 
     @Before
     public void init(){
-        measurementService.deleteAllMeasurements();
+        //measurementService.deleteAllMeasurements();
     }
 
     @Test
@@ -80,25 +80,7 @@ public class MeasurementTest {
     }
 
     @Test
-    public void testGetWeatherData(){
-        String urlString = "https://api.openweathermap.org/data/2.5/group?id=524901,703448,2643743,3067696,3077929,3071961,3078610,3068799,3077318&appid=ab9635a72d36ec4ce25bd37c0f200ba9&units=metric";
-        try {
-            StringBuilder result = new StringBuilder();
-            URL url = new URL(urlString);
-            URLConnection conn = url.openConnection();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            while((line = rd.readLine()) != null){
-                result.append(line);
-            }
-            rd.close();
-            JsonParser parser = new JsonParser();
-            ArrayList<Measurement> measurements = parser.getMeasurementsFromJson(result);
-            System.out.println(measurements);
-        }
-        catch (Exception e){
-            System.out.println(e.toString());
-        }
-
+    public void testChangeTownNameOfMeasurement(){
+        measurementService.updateTownNameOfMeasurement("Prague",3067696);
     }
 }

@@ -41,35 +41,35 @@ public class Measurement {
         this.description = description;
     }
 
-    public Float getTemperature() {
+    public Double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(Float temperature) {
+    public void setTemperature(Double temperature) {
         this.temperature = temperature;
     }
 
-    public Float getFeelsLike() {
+    public Double getFeelsLike() {
         return feelsLike;
     }
 
-    public void setFeelsLike(Float feelsLike) {
+    public void setFeelsLike(Double feelsLike) {
         this.feelsLike = feelsLike;
     }
 
-    public Float getMaximalTemperature() {
+    public Double getMaximalTemperature() {
         return maximalTemperature;
     }
 
-    public void setMaximalTemperature(Float maximalTemperature) {
+    public void setMaximalTemperature(Double maximalTemperature) {
         this.maximalTemperature = maximalTemperature;
     }
 
-    public Float getMinimalTemperature() {
+    public Double getMinimalTemperature() {
         return minimalTemperature;
     }
 
-    public void setMinimalTemperature(Float minimalTemperature) {
+    public void setMinimalTemperature(Double minimalTemperature) {
         this.minimalTemperature = minimalTemperature;
     }
 
@@ -89,11 +89,11 @@ public class Measurement {
         this.humidity = humidity;
     }
 
-    public Float getWindSpeed() {
+    public Integer getWindSpeed() {
         return windSpeed;
     }
 
-    public void setWindSpeed(Float windSpeed) {
+    public void setWindSpeed(Integer windSpeed) {
         this.windSpeed = windSpeed;
     }
 
@@ -108,7 +108,7 @@ public class Measurement {
     public Measurement(){
 
     }
-    public Measurement(Integer townId, Long ts, String main, String description, Float temperature, Float feelsLike, Float maximalTemperature, Float minimalTemperature, Integer pressure, Integer humidity, Float windSpeed, Integer windDegree,String townName, String countryName) {
+    public Measurement(Integer townId, Long ts, String main, String description, Double temperature, Double feelsLike, Double maximalTemperature, Double minimalTemperature, Integer pressure, Integer humidity, Integer windSpeed, Integer windDegree,String townName, String countryCode) {
         this.townId = townId;
         this.ts = ts;
         this.main = main;
@@ -121,7 +121,7 @@ public class Measurement {
         this.humidity = humidity;
         this.windSpeed = windSpeed;
         this.windDegree = windDegree;
-        this.countryName = countryName;
+        this.countryCode = countryCode;
         this.townName = townName;
         this.id = createMeasurementId(townId,ts);
     }
@@ -134,14 +134,14 @@ public class Measurement {
     String main;
     String description;
     String townName;
-    String countryName;
-    Float temperature;
-    Float feelsLike;
-    Float maximalTemperature;
-    Float minimalTemperature;
+    String countryCode;
+    Double temperature;
+    Double feelsLike;
+    Double maximalTemperature;
+    Double minimalTemperature;
     Integer pressure;
     Integer humidity;
-    Float windSpeed;
+    Integer windSpeed;
     Integer windDegree;
 
     public static Long createMeasurementId(int townID,long timeStamp){

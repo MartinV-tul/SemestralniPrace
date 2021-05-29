@@ -2,6 +2,7 @@ package cz.tul.controller;
 
 
 import cz.tul.data.Country;
+import cz.tul.data.Measurement;
 import cz.tul.data.Town;
 import cz.tul.service.CountryService;
 import cz.tul.service.MeasurementService;
@@ -13,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -80,7 +82,13 @@ public class AppController {
     @GetMapping("/showTownsOfCountry")
     public ModelAndView showTownsOfCountry(@RequestParam String code,@RequestParam String name, Model model){
         List<Town> towns = townService.getTownsByCountryCode(code);
-        model.addAttribute("towns",towns);
+        List<TownMeasurement> townMeasurements = new ArrayList<>();
+        if(towns!=null){
+            for (Town town:towns) {
+                townMeasurements.add(new TownMeasurement(town));
+            }
+        }
+        model.addAttribute("towns",townMeasurements);
         String text = "Towns of " + name;
         model.addAttribute("text",text);
         model.addAttribute("countryName",name);
@@ -91,13 +99,32 @@ public class AppController {
     }
 
     private class TownMeasurement{
-        public TownMeasurement(Integer id, String name, String main, String description, Float actualTemperature, Float windSpeed) {
-            this.id = id;
-            this.name = name;
-            this.main = main;
-            this.description = description;
-            this.actualTemperature = actualTemperature;
-            this.windSpeed = windSpeed;
+        public TownMeasurement(Town town) {
+            this.id = town.getId();
+            this.name = town.getName();
+            Measurement measurement = measurementService.getLastMeasurementOfTown(town.getId());
+            if(measurement != null){
+                this.actualTemperature = roundNumber(measurement.getTemperature());
+                this.oneDayAverageTemperature = roundNumber(measurementService.oneDayAverage(measurement.getTs(),town.getId()));
+                this.oneWeekAverageTemperature = roundNumber(measurementService.oneWeekAverage(measurement.getTs(),town.getId()));
+                this.twoWeeksAverageTemperature = roundNumber(measurementService.twoWeeksAverage(measurement.getTs(),town.getId()));
+                this.humidity = measurement.getHumidity().toString();
+                this.windSpeed = measurement.getWindSpeed().toString();
+                this.main = measurement.getMain();
+                this.description = measurement.getDescription();
+                this.pressure = measurement.getPressure().toString();
+            }
+            else{
+                this.actualTemperature = "N/A";
+                this.oneDayAverageTemperature = "N/A";
+                this.oneWeekAverageTemperature = "N/A";
+                this.twoWeeksAverageTemperature = "N/A";
+                this.humidity = "N/A";
+                this.windSpeed = "N/A";
+                this.main = "N/A";
+                this.description = "N/A";
+                this.pressure = "N/A";
+            }
         }
 
         public Integer getId() {
@@ -132,55 +159,79 @@ public class AppController {
             this.description = description;
         }
 
-        public Float getActualTemperature() {
+        public String getActualTemperature() {
             return actualTemperature;
         }
 
-        public void setActualTemperature(Float actualTemperature) {
+        public void setActualTemperature(String actualTemperature) {
             this.actualTemperature = actualTemperature;
         }
 
-        public Float getOneDayAverageTemperature() {
+        public String getOneDayAverageTemperature() {
             return oneDayAverageTemperature;
         }
 
-        public void setOneDayAverageTemperature(Float oneDayAverageTemperature) {
+        public void setOneDayAverageTemperature(String oneDayAverageTemperature) {
             this.oneDayAverageTemperature = oneDayAverageTemperature;
         }
 
-        public Float getOneWeekAverageTemperature() {
+        public String getOneWeekAverageTemperature() {
             return oneWeekAverageTemperature;
         }
 
-        public void setOneWeekAverageTemperature(Float oneWeekAverageTemperature) {
+        public void setOneWeekAverageTemperature(String oneWeekAverageTemperature) {
             this.oneWeekAverageTemperature = oneWeekAverageTemperature;
         }
 
-        public Float getTwoWeeksAverageTemperature() {
+        public String getTwoWeeksAverageTemperature() {
             return twoWeeksAverageTemperature;
         }
 
-        public void setTwoWeeksAverageTemperature(Float twoWeeksAverageTemperature) {
+        public void setTwoWeeksAverageTemperature(String twoWeeksAverageTemperature) {
             this.twoWeeksAverageTemperature = twoWeeksAverageTemperature;
         }
 
-        public Float getWindSpeed() {
+        public String getWindSpeed() {
             return windSpeed;
         }
 
-        public void setWindSpeed(Float windSpeed) {
+        public void setWindSpeed(String windSpeed) {
             this.windSpeed = windSpeed;
         }
+
+
+        public String getHumidity() {
+            return humidity;
+        }
+
+        public void setHumidity(String humidity) {
+            this.humidity = humidity;
+        }
+
+        public String getPressure() {
+            return pressure;
+        }
+
+        public void setPressure(String pressure) {
+            this.pressure = pressure;
+        }
+
 
         private Integer id;
         private String name;
         private String main;
         private String description;
-        private Float actualTemperature;
-        private Float oneDayAverageTemperature;
-        private Float oneWeekAverageTemperature;
-        private Float twoWeeksAverageTemperature;
-        private Float windSpeed;
+        private String actualTemperature;
+        private String oneDayAverageTemperature;
+        private String oneWeekAverageTemperature;
+        private String twoWeeksAverageTemperature;
+        private String windSpeed;
+        private String humidity;
+        private String pressure;
 
+        private String roundNumber(double d){
+            Float roundedNumber = (float) Math.round(d*10)/10;
+            return roundedNumber.toString();
+        }
     }
 }

@@ -8,6 +8,7 @@ import cz.tul.data.Town;
 import cz.tul.service.CountryService;
 import cz.tul.service.MeasurementService;
 import cz.tul.service.TownService;
+import cz.tul.thread.UpdateThread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -31,10 +32,12 @@ public class Main {
     @Bean
     public MeasurementService measurementService(){return new MeasurementService();}
 
-
+    Integer updateTime = 5000;
 
     public static void main(String[] args){
         SpringApplication app = new SpringApplication(Main.class);
         ApplicationContext context = app.run(args);
+        UpdateThread updateThread = new UpdateThread(context.getBean(TownService.class),context.getBean(MeasurementService.class));
+        updateThread.start();
     }
 }

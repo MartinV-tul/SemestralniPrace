@@ -5,10 +5,13 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @Document(collection = "measurement")
 public class Measurement {
+
     public Integer getTownId() {
         return townId;
     }
@@ -124,10 +127,13 @@ public class Measurement {
         this.countryCode = countryCode;
         this.townName = townName;
         this.id = createMeasurementId(townId,ts);
+        this.createdAt = new Date(ts*1000);
     }
 
     @Id
     Long id;
+
+    Date createdAt;
 
     Integer townId;
     Long ts;
@@ -150,7 +156,7 @@ public class Measurement {
 
     @Override
     public String toString() {
-        return "Measurement ["+ts+", "+main+", "+description+", "+temperature+", "+feelsLike+", "+maximalTemperature+", "+minimalTemperature+", "+pressure+", "+humidity+", "+windSpeed+", "+windDegree+"]";
+        return "cz.tul.data.Measurement,"+id+","+countryCode+","+createdAt+","+description+","+feelsLike+","+humidity+","+main+","+maximalTemperature+","+minimalTemperature+","+pressure+","+temperature+","+townId+","+townName+","+ts+","+windDegree+","+windSpeed;
     }
 
 

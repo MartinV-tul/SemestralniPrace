@@ -4,15 +4,27 @@ package cz.tul.controller;
 import cz.tul.data.Country;
 import cz.tul.data.Measurement;
 import cz.tul.data.Town;
+import cz.tul.parser.CSVParser;
 import cz.tul.service.CountryService;
 import cz.tul.service.MeasurementService;
 import cz.tul.service.TownService;
 import cz.tul.thread.UpdateThread;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +57,102 @@ public class AppController {
         UpdateThread.updateTime = 5000;
         return  "Update time lower than 5000ms is not allowed. Update time set to 5000ms.";
     }
+
+    @GetMapping("/setExpirationTime")
+    public String setExpirationTime(@RequestParam Integer time){
+        if(time>=3600){
+            measurementService.changeExpirationTime(time);
+            return "Expiration time successfully set to: "+time+"s.";
+        }
+        measurementService.changeExpirationTime(3600);
+        return "Expiration time lower then 1 hour is not allowed. Expiration time set to 3600s.";
+    }
+
+    @GetMapping("/downloadMeasurementsOfCountry")
+    public ResponseEntity<Object> downloadAllMeasurementsOfCountry(@RequestParam String code){
+        CSVParser csvParser = new CSVParser();
+        StringBuilder csv = csvParser.createCSV(measurementService.getAllMeasurementsOfCountry(code));
+        String fileName = "C:\\csvDownload/measurements_"+code+".csv";
+        return downloadMeasurements(fileName,csv);
+    }
+
+    @GetMapping("/downloadMeasurementsOfTown")
+    public ResponseEntity<Object> downloadAllMeasurementsOfTown(@RequestParam Integer townId,@RequestParam String name){
+        CSVParser csvParser = new CSVParser();
+        StringBuilder csv = csvParser.createCSV(measurementService.getAllMeasurementsOfTown(townId));
+        String fileName = "C:\\csvDownload/measurements_"+name+".csv";
+        return downloadMeasurements(fileName,csv);
+    }
+
+    @GetMapping("/downloadAllMeasurements")
+    public ResponseEntity<Object> downloadAllMeasurements(){
+        CSVParser csvParser = new CSVParser();
+        StringBuilder csv = csvParser.createCSV(measurementService.getAllMeasurements());
+        String fileName = "C:\\csvDownload/measurements.csv";
+        return downloadMeasurements(fileName,csv);
+    }
+
+    private ResponseEntity<Object> downloadMeasurements(String fileName,StringBuilder csv){
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter(fileName);
+            writer.write(csv.toString());
+            writer.flush();
+
+            File file = new File(fileName);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition",String.format("attachment;filename=\"%s\"",file.getName()));
+            headers.add("Cache-Control","no-cache, no-store, must-revalidate");
+            headers.add("Pragma","no-cache");
+            headers.add("Expires","0");
+            ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("text/csv")).body(resource);
+            return responseEntity;
+        }catch (Exception e){
+            return new ResponseEntity<>("ERROR OCCURRED", HttpStatus.OK);
+        }
+        finally {
+            try {
+                if(writer != null) writer.close();
+            }
+            catch (Exception e){
+
+            }
+        }
+    }
+
+    @PostMapping("/upload")
+    public String upload(@RequestParam(value = "file")MultipartFile file){
+        if(file.isEmpty()){
+            return "no file selected";
+        }
+
+        try {
+            InputStream inputStream = file.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            CSVParser csvParser = new CSVParser();
+            List<Measurement> measurements = csvParser.createList(reader);
+            for (Measurement measurement:measurements) {
+                String code = measurement.getCountryCode();
+                Integer townId = measurement.getTownId();
+                String name = measurement.getTownName();
+                Country country = new Country(code,"Country_"+code);
+                if(!countryService.exists(code)){
+                    countryService.saveOrUpdate(country);
+                }
+                Town town = new Town(townId,name,country);
+                if (!townService.exists(townId)) {
+                    townService.saveOrUpdate(town);
+                }
+            }
+            measurementService.saveAllMeasurements(measurements);
+        }catch (Exception e)
+        {
+
+        }
+        return "file selected";
+    }
+
 
     @GetMapping("/newCountryForm")
     public ModelAndView newCountryForm(Model model){

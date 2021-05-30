@@ -42,11 +42,9 @@ public class JsonParser {
         }
       return null;
     }
-    //TODO upload a download mereni(zitra)
     //TODO read only mode
     //TODO logovani
     //TODO testy
     //TODO samostatne spustitelna aplikace
     //TODO externi zmena properties souboru
-    //TODO expirace zaznamu, nastaveni casu expirace(zitra)
 }

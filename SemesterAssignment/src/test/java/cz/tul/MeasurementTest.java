@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -82,5 +83,30 @@ public class MeasurementTest {
     @Test
     public void testChangeTownNameOfMeasurement(){
         measurementService.updateTownNameOfMeasurement("Prague",3067696);
+    }
+
+    @Test
+    public void testExpirationTime(){
+        Long time = new Date().getTime()/1000;
+        Measurement measurement = new Measurement(3067696,time,"Clouds","overcast clouds",11.97,11.34,12.28,10.66,1014,81,5,221,"Prague","CZ");
+        measurementService.createExpirationIndexIfNotExists();
+        measurementService.changeExpirationTime(60);
+        measurementService.saveMeasurement(measurement);
+        List<Measurement> measurements = measurementService.getAllMeasurements();
+        assertEquals("One measurement should have been saved and retrieved",1,measurements.size());
+        try {
+            Thread.sleep(120000);
+        }catch (Exception e){
+
+        }
+        List<Measurement> measurements1 = measurementService.getAllMeasurements();
+        assertEquals("One measurement should have expired",0,measurements1.size());
+        measurementService.changeExpirationTime(1209600);
+    }
+
+    @Test
+    public void testMeasurementToString(){
+        String s = measurement1.toString();
+        System.out.println(s);
     }
 }

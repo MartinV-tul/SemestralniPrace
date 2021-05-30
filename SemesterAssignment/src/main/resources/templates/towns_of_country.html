@@ -9,7 +9,7 @@
           crossorigin="anonymous">
 </head>
 <body>
-<div align="center" class="container my-2">
+<div align="center" class="container m-0">
 
     <h1 th:text="${text}"></h1>
     <a th:href="@{/newTownForm(code = ${code},countryName=${countryName})}" class="btn btn-primary btn-sm mb-2">Add or update town</a>
@@ -27,7 +27,8 @@
             <th>One day average temperature(°C)</th>
             <th>One week average temperature(°C)</th>
             <th>Two weeks average temperature(°C)</th>
-            <th></th>
+            <th>Delete town</th>
+            <th>Download measurements</th>
         </tr>
         </thead>
         <tbody>
@@ -43,7 +44,8 @@
             <td th:text="${town.getOneDayAverageTemperature()}"></td>
             <td th:text="${town.getOneWeekAverageTemperature()}"></td>
             <td th:text="${town.getTwoWeeksAverageTemperature()}"></td>
-            <td style="text-align: center" ><a th:href="@{/deleteTown(code = ${code},countryName=${countryName},townId=${town.id})}"  class="btn btn-primary">Delete country</a> </td>
+            <td style="text-align: center" ><a th:href="@{/deleteTown(code = ${code},countryName=${countryName},townId=${town.id})}"  class="btn btn-primary">Delete</a> </td>
+            <td style="text-align: center" ><a th:href="@{/downloadMeasurementsOfTown(townId=${town.id},name=${town.name})}"  class="btn btn-primary">Download</a> </td>
         </tr>
         </tbody>
     </table>

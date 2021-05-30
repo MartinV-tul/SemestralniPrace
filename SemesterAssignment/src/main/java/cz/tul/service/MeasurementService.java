@@ -4,8 +4,11 @@ import cz.tul.data.Measurement;
 import cz.tul.repositories.MeasurementRepository;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.index.IndexInfo;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -25,8 +28,31 @@ public class MeasurementService {
         return measurementRepository.findAllByTownIdOrderByTsDesc(townId);
     }
 
+    public List<Measurement> getAllMeasurementsOfCountry(String code){
+        return measurementRepository.findAllByCountryCodeOrderByTsDesc(code);
+    }
+
     public Measurement getLastMeasurementOfTown(int townId){
         return  measurementRepository.findFirstByTownIdOrderByTsDesc(townId);
+    }
+
+    public void createExpirationIndexIfNotExists(){
+        List<IndexInfo> s = mongoTemplate.indexOps(Measurement.class).getIndexInfo();
+        for (IndexInfo info:s) {
+            if(info.getName().equals("createdAt_1")) return;
+        }
+        createExpirationIndex(1209600);
+    }
+
+    public void changeExpirationTime(int newTimeOfExpiration){
+        mongoTemplate.indexOps(Measurement.class).dropIndex("createdAt_1");
+        createExpirationIndex(newTimeOfExpiration);
+    }
+
+    private void createExpirationIndex(int expirationTime){
+        mongoTemplate
+                .indexOps(Measurement.class)
+                .ensureIndex(new Index().on("createdAt", Sort.Direction.ASC).expire(expirationTime));
     }
 
     public void saveMeasurement(Measurement measurement){

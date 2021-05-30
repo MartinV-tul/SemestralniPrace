@@ -32,11 +32,12 @@ public class Main {
     @Bean
     public MeasurementService measurementService(){return new MeasurementService();}
 
-    Integer updateTime = 5000;
-
     public static void main(String[] args){
         SpringApplication app = new SpringApplication(Main.class);
         ApplicationContext context = app.run(args);
+
+        MeasurementService measurementService = context.getBean(MeasurementService.class);
+        measurementService.createExpirationIndexIfNotExists();
         UpdateThread updateThread = new UpdateThread(context.getBean(TownService.class),context.getBean(MeasurementService.class));
         updateThread.start();
     }

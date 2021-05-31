@@ -5,6 +5,8 @@ import cz.tul.controller.AppController;
 import cz.tul.data.Country;
 import cz.tul.data.Measurement;
 import cz.tul.data.Town;
+import cz.tul.parser.CSVParser;
+import cz.tul.parser.JsonParser;
 import cz.tul.service.CountryService;
 import cz.tul.service.MeasurementService;
 import cz.tul.service.TownService;
@@ -39,6 +41,12 @@ public class Main {
 
     @Bean
     public UploadDownload uploadDownload(){return new UploadDownload();}
+
+    @Bean
+    public CSVParser csvParser(){return new CSVParser();}
+
+    @Bean
+    public JsonParser jsonParser(){return new JsonParser();}
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 

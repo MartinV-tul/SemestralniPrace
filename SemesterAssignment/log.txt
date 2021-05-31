@@ -1,19 +1,13 @@
-19:58:49.314 [main] INFO  cz.tul.MeasurementTest - Starting MeasurementTest using Java 15.0.2 on DESKTOP-6DDQFN5 with PID 16600 (started by Martin in C:\Users\votyp\Desktop\Java-sp\SemestralniPrace\SemesterAssignment)
-19:58:49.316 [main] INFO  cz.tul.MeasurementTest - No active profile set, falling back to default profiles: default
-19:58:50.824 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-19:58:51.141 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-19:58:52.241 [main] INFO  org.mongodb.driver.cluster - Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms'}
-19:58:52.304 [cluster-rtt-ClusterId{value='60b523dcac85442a8989ab91', description='null'}-localhost:27017] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:1, serverValue:814}] to localhost:27017
-19:58:52.304 [cluster-ClusterId{value='60b523dcac85442a8989ab91', description='null'}-localhost:27017] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:2, serverValue:813}] to localhost:27017
-19:58:52.304 [cluster-ClusterId{value='60b523dcac85442a8989ab91', description='null'}-localhost:27017] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=9, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=28614000}
-19:58:53.233 [main] INFO  cz.tul.MeasurementTest - Started MeasurementTest in 4.239 seconds (JVM running for 5.019)
-19:58:53.395 [main] WARN  cz.tul.service.MeasurementService - Deleting all measurements.
-19:58:53.434 [main] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:3, serverValue:815}] to localhost:27017
-19:58:53.552 [main] WARN  cz.tul.service.MeasurementService - New expiration index will be created.
-19:58:53.611 [main] INFO  cz.tul.service.MeasurementService - Saving one measurement.
-19:58:53.635 [main] INFO  cz.tul.service.MeasurementService - Loading all measurements.
-20:00:53.659 [main] INFO  cz.tul.service.MeasurementService - Loading all measurements.
-20:00:53.697 [main] WARN  cz.tul.service.MeasurementService - New expiration index will be created.
-20:00:53.809 [SpringContextShutdownHook] INFO  org.mongodb.driver.connection - Closed connection [connectionId{localValue:3, serverValue:815}] to localhost:27017 because the pool has been closed.
-20:00:53.812 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-20:00:53.819 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+23:59:14.692 [main] INFO  cz.tul.UploadDownloadTest - Starting UploadDownloadTest using Java 15.0.2 on DESKTOP-6DDQFN5 with PID 16708 (started by Martin in C:\Users\votyp\Desktop\Java-sp\SemestralniPrace\SemesterAssignment)
+23:59:14.694 [main] INFO  cz.tul.UploadDownloadTest - No active profile set, falling back to default profiles: default
+23:59:16.253 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+23:59:16.565 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+23:59:17.686 [main] INFO  org.mongodb.driver.cluster - Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms'}
+23:59:17.740 [cluster-ClusterId{value='60b55c35f7fa5c4efb7c5199', description='null'}-localhost:27017] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:2, serverValue:836}] to localhost:27017
+23:59:17.740 [cluster-rtt-ClusterId{value='60b55c35f7fa5c4efb7c5199', description='null'}-localhost:27017] INFO  org.mongodb.driver.connection - Opened connection [connectionId{localValue:1, serverValue:835}] to localhost:27017
+23:59:17.740 [cluster-ClusterId{value='60b55c35f7fa5c4efb7c5199', description='null'}-localhost:27017] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=9, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=17595800}
+23:59:18.633 [main] INFO  cz.tul.UploadDownloadTest - Started UploadDownloadTest in 4.262 seconds (JVM running for 5.031)
+23:59:18.820 [main] INFO  cz.tul.parser.CSVParser - CSV file from measurements created.
+23:59:18.823 [main] INFO  cz.tul.parser.CSVParser - 2measurements parsed from input.
+23:59:18.838 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+23:59:18.845 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

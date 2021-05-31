@@ -1,8 +1,6 @@
 package cz.tul.repositories;
 
-import cz.tul.data.Country;
 import cz.tul.data.Town;
-import cz.tul.data.TownID;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -22,6 +20,11 @@ public interface TownRepository extends CrudRepository<Town, Integer> {
     @Modifying
     @Query("delete from Town as t where t.id=:id")
     public void deleteTownById(@Param("id") Integer id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "delete from town",nativeQuery = true)
+    public void deleteAllTowns();
 
     @Transactional
     @Modifying

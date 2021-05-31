@@ -9,22 +9,15 @@ import cz.tul.service.CountryService;
 import cz.tul.service.MeasurementService;
 import cz.tul.service.TownService;
 import cz.tul.thread.UpdateThread;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
+import cz.tul.uploaddownload.UploadDownload;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.util.MimeType;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,16 +33,24 @@ public class AppController {
     @Autowired
     private MeasurementService measurementService;
 
+    @Autowired
+    private UploadDownload uploadDownload;
+
+    @Value("${readonly}")
+    private boolean readonly;
+
     @GetMapping("/")
     public ModelAndView viewHomePage(Model model){
         model.addAttribute("countries",countryService.getAllCountries());
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("index");
+        if(readonly)modelAndView.setViewName("readonly_index");
+        else modelAndView.setViewName("index");
         return modelAndView;
     }
 
     @GetMapping("/setUpdateTime")
     public String setUpdateTime(@RequestParam Integer time){
+        if(readonly) return "Update is not enabled in readonly mode";
         if(time >=5000){
             UpdateThread.updateTime = time;
             return "Update time successfully set to: " + time+"ms.";
@@ -60,6 +61,7 @@ public class AppController {
 
     @GetMapping("/setExpirationTime")
     public String setExpirationTime(@RequestParam Integer time){
+        if(readonly) return "Changing expiration time is not allowed in readonly mode";
         if(time>=3600){
             measurementService.changeExpirationTime(time);
             return "Expiration time successfully set to: "+time+"s.";
@@ -73,7 +75,7 @@ public class AppController {
         CSVParser csvParser = new CSVParser();
         StringBuilder csv = csvParser.createCSV(measurementService.getAllMeasurementsOfCountry(code));
         String fileName = "C:\\csvDownload/measurements_"+code+".csv";
-        return downloadMeasurements(fileName,csv);
+        return uploadDownload.downloadMeasurements(fileName,csv);
     }
 
     @GetMapping("/downloadMeasurementsOfTown")
@@ -81,7 +83,7 @@ public class AppController {
         CSVParser csvParser = new CSVParser();
         StringBuilder csv = csvParser.createCSV(measurementService.getAllMeasurementsOfTown(townId));
         String fileName = "C:\\csvDownload/measurements_"+name+".csv";
-        return downloadMeasurements(fileName,csv);
+        return uploadDownload.downloadMeasurements(fileName,csv);
     }
 
     @GetMapping("/downloadAllMeasurements")
@@ -89,95 +91,69 @@ public class AppController {
         CSVParser csvParser = new CSVParser();
         StringBuilder csv = csvParser.createCSV(measurementService.getAllMeasurements());
         String fileName = "C:\\csvDownload/measurements.csv";
-        return downloadMeasurements(fileName,csv);
-    }
-
-    private ResponseEntity<Object> downloadMeasurements(String fileName,StringBuilder csv){
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter(fileName);
-            writer.write(csv.toString());
-            writer.flush();
-
-            File file = new File(fileName);
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition",String.format("attachment;filename=\"%s\"",file.getName()));
-            headers.add("Cache-Control","no-cache, no-store, must-revalidate");
-            headers.add("Pragma","no-cache");
-            headers.add("Expires","0");
-            ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("text/csv")).body(resource);
-            return responseEntity;
-        }catch (Exception e){
-            return new ResponseEntity<>("ERROR OCCURRED", HttpStatus.OK);
-        }
-        finally {
-            try {
-                if(writer != null) writer.close();
-            }
-            catch (Exception e){
-
-            }
-        }
+        return uploadDownload.downloadMeasurements(fileName,csv);
     }
 
     @PostMapping("/upload")
     public String upload(@RequestParam(value = "file")MultipartFile file){
+        if(readonly) return "upload is not allowed in readonly mode";
         if(file.isEmpty()){
             return "no file selected";
         }
-
-        try {
-            InputStream inputStream = file.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            CSVParser csvParser = new CSVParser();
-            List<Measurement> measurements = csvParser.createList(reader);
-            for (Measurement measurement:measurements) {
-                String code = measurement.getCountryCode();
-                Integer townId = measurement.getTownId();
-                String name = measurement.getTownName();
-                Country country = new Country(code,"Country_"+code);
-                if(!countryService.exists(code)){
-                    countryService.saveOrUpdate(country);
-                }
-                Town town = new Town(townId,name,country);
-                if (!townService.exists(townId)) {
-                    townService.saveOrUpdate(town);
-                }
+        List<Measurement> measurements =uploadDownload.upload(file);
+        for (Measurement measurement:measurements) {
+            String code = measurement.getCountryCode();
+            Integer townId = measurement.getTownId();
+            String name = measurement.getTownName();
+            Country country = new Country(code,"Country_"+code);
+            if(!countryService.exists(code)){
+                countryService.saveOrUpdate(country);
             }
-            measurementService.saveAllMeasurements(measurements);
-        }catch (Exception e)
-        {
-
+            Town town = new Town(townId,name,country);
+            if (!townService.exists(townId)) {
+                townService.saveOrUpdate(town);
+            }
         }
-        return "file selected";
+        measurementService.saveAllMeasurements(measurements);
+        return "file uploaded";
     }
 
 
     @GetMapping("/newCountryForm")
     public ModelAndView newCountryForm(Model model){
+        ModelAndView modelAndView = new ModelAndView();
+        if(readonly){
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
         Country country = new Country();
         model.addAttribute(country);
-        ModelAndView modelAndView = new ModelAndView();
+
         modelAndView.setViewName("new_country");
         return modelAndView;
     }
 
     @GetMapping("/newTownForm")
     public ModelAndView newTownForm(@RequestParam String code,@RequestParam String countryName, Model model){
+        ModelAndView modelAndView = new ModelAndView();
+        if(readonly){
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
         Town town = new Town();
         model.addAttribute("town",town);
         model.addAttribute("code",code);
         model.addAttribute("countryName",countryName);
-        ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("new_town");
         return modelAndView;
     }
 
     @GetMapping("/deleteCountry")
     public ModelAndView deleteCountry(@RequestParam String code){
-        measurementService.deleteAllMeasurementsOfCountry(code);
-        countryService.deleteCountryByCode(code);
+        if(!readonly){
+            measurementService.deleteAllMeasurementsOfCountry(code);
+            countryService.deleteCountryByCode(code);
+        }
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("redirect:/");
         return modelAndView;
@@ -185,11 +161,13 @@ public class AppController {
 
     @PostMapping("/saveCountry")
     public ModelAndView saveCountry(@ModelAttribute("country") Country country){
-        if(countryService.exists(country.getCode())){
-            List<Town> towns = townService.getTownsByCountryCode(country.getCode());
-            country.setTowns(towns);
+        if(!readonly){
+            if(countryService.exists(country.getCode())){
+                List<Town> towns = townService.getTownsByCountryCode(country.getCode());
+                country.setTowns(towns);
+            }
+            countryService.saveOrUpdate(country);
         }
-        countryService.saveOrUpdate(country);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("redirect:/");
         return modelAndView;
@@ -197,12 +175,14 @@ public class AppController {
 
     @PostMapping("/saveTown")
     public ModelAndView saveTown(@ModelAttribute("town") Town town,@RequestParam String code, @RequestParam String countryName){
-        Country country = new Country(code,countryName);
-        town.setCountry(country);
-        if(townService.exists(town.getId())){
-            measurementService.updateTownNameOfMeasurement(town.getName(),town.getId());
+        if(!readonly){
+            Country country = new Country(code,countryName);
+            town.setCountry(country);
+            if(townService.exists(town.getId())){
+                measurementService.updateTownNameOfMeasurement(town.getName(),town.getId());
+            }
+            townService.saveOrUpdate(town);
         }
-        townService.saveOrUpdate(town);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("redirect:/showTownsOfCountry?code="+code+"&name="+countryName);
         return modelAndView;
@@ -210,8 +190,10 @@ public class AppController {
 
     @GetMapping("/deleteTown")
     public ModelAndView deleteTown(@RequestParam String code, @RequestParam String countryName, @RequestParam Integer townId){
-        townService.deleteTownById(townId);
-        measurementService.deleteAllMeasurementsOfTown(townId);
+        if(!readonly){
+            townService.deleteTownById(townId);
+            measurementService.deleteAllMeasurementsOfTown(townId);
+        }
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("redirect:/showTownsOfCountry?code="+code+"&name="+countryName);
         return modelAndView;
@@ -232,7 +214,8 @@ public class AppController {
         model.addAttribute("countryName",name);
         model.addAttribute("code",code);
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("towns_of_country");
+        if(readonly)modelAndView.setViewName("readonly_towns_of_country");
+        else modelAndView.setViewName("towns_of_country");
         return modelAndView;
     }
 

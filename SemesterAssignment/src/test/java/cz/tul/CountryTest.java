@@ -15,6 +15,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {Main.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -23,42 +25,45 @@ public class CountryTest {
     @Autowired
     private CountryService countryService;
 
-    @Autowired
-    private TownService townService;
-
-    private Country country1 = new Country("CZ","Česká Republika");
-    private Country country2 = new Country("SK","Slovensko");
+    private Country country1 = new Country("CZ","Czech Republic");
+    private Country country2 = new Country("SK","Slovakia");
 
 
     @Before
     public void init() {
-        //townService.deleteAllTowns();
         countryService.deleteAllCountries();
     }
 
+
     @Test
-    public void testCreateCountry(){
+    public void testSaveGetAndDelete(){
         countryService.saveOrUpdate(country1);
         countryService.saveOrUpdate(country2);
+        List<Country> countries1 = countryService.getAllCountries();
+        assertEquals("Two countries should have been saved and retrieved",2,countries1.size());
+        countryService.deleteCountryByCode(country1.getCode());
+        List<Country> countries2 = countryService.getAllCountries();
+        assertEquals("One country should have been deleted and retrieved",1,countries2.size());
+        countryService.deleteAllCountries();
+        List<Country> countries3 = countryService.getAllCountries();
+        assertEquals("All countries should have been deleted.",0,countries3.size());
+    }
 
-        Town town1 = new Town(1,"Praha",country1);
-        Town town2 = new Town(2,"Brno",country1);
-        Town town3 = new Town(3,"Liberec",country1);
-        Town town4 = new Town(4,"Bratislava",country2);
-        Town town5 = new Town(5,"Kosice",country2);
-        Town town6 = new Town(6,"Trencin",country2);
 
-        townService.saveOrUpdate(town1);
-        townService.saveOrUpdate(town2);
-        townService.saveOrUpdate(town3);
-        townService.saveOrUpdate(town4);
-        townService.saveOrUpdate(town5);
-        townService.saveOrUpdate(town6);
+    @Test
+    public void testUpdate(){
+        countryService.saveOrUpdate(country1);
+        country1.setCountryName("Czechia");
+        countryService.saveOrUpdate(country1);
+        List<Country> countries = countryService.getAllCountries();
+        assertEquals("Name of country should have been changed.",country1.getCountryName(),countries.get(0).getCountryName());
+        country1.setCountryName("Czech Republic");
+    }
 
-        List<Town> towns = townService.getTownsByCountryCode(country1.getCode());
-        System.out.println(towns);
-
-        countryService.deleteCountry(country2);
+    @Test
+    public void testExists(){
+        countryService.saveOrUpdate(country1);
+        assertEquals("Country should exist.",true,countryService.exists(country1.getCode()));
     }
 
 }

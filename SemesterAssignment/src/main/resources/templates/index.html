@@ -35,7 +35,7 @@
         </tbody>
     </table>
     <form action="#" th:action="@{/upload}" enctype="multipart/form-data" method="post">
-        <input type="file" name="file">
+        <input type="file" name="file" accept=".csv">
         <input type="submit" th:value="Upload" class="btn btn-info col-2">
     </form>
 </div>

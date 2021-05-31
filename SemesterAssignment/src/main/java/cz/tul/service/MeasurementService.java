@@ -3,6 +3,8 @@ package cz.tul.service;
 import cz.tul.data.Measurement;
 import cz.tul.repositories.MeasurementRepository;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -24,15 +26,20 @@ public class MeasurementService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    private static final Logger logger = LoggerFactory.getLogger(MeasurementService.class);
+
     public List<Measurement> getAllMeasurementsOfTown(int townId){
+        logger.info("Loading all measurements of town: townId="+townId+".");
         return measurementRepository.findAllByTownIdOrderByTsDesc(townId);
     }
 
     public List<Measurement> getAllMeasurementsOfCountry(String code){
+        logger.info("Loading all measurements of country: code="+code+".");
         return measurementRepository.findAllByCountryCodeOrderByTsDesc(code);
     }
 
     public Measurement getLastMeasurementOfTown(int townId){
+        logger.info("Loading last measurement of town: townId="+townId+".");
         return  measurementRepository.findFirstByTownIdOrderByTsDesc(townId);
     }
 
@@ -50,40 +57,49 @@ public class MeasurementService {
     }
 
     private void createExpirationIndex(int expirationTime){
+        logger.warn("New expiration index will be created.");
         mongoTemplate
                 .indexOps(Measurement.class)
                 .ensureIndex(new Index().on("createdAt", Sort.Direction.ASC).expire(expirationTime));
     }
 
     public void saveMeasurement(Measurement measurement){
+        logger.info("Saving one measurement.");
         measurementRepository.save(measurement);
     }
 
     public void saveAllMeasurements(List<Measurement> measurements){
+        logger.info("Saving measurements.");
         measurementRepository.saveAll(measurements);
     }
 
     public void deleteAllMeasurements(){
+        logger.warn("Deleting all measurements.");
         measurementRepository.deleteAll();
     }
 
     public void deleteAllMeasurementsOfTown(int townId){
+        logger.warn("Deleting measurements of town: townId="+townId+".");
         measurementRepository.deleteAllByTownId(townId);
     }
 
     public void deleteAllMeasurementsOfCountry(String code){
+        logger.warn("Deleting measurements of country: code="+code+".");
         measurementRepository.deleteAllByCountryCode(code);
     }
 
     public void deleteMeasurement(Measurement measurement){
+        logger.warn("Deleting one measurement.");
         measurementRepository.delete(measurement);
     }
 
     public void updateTownNameOfMeasurement(String townName,int townId){
+        logger.warn("Changing name of town: townId="+townId+" to "+townName+".");
         mongoTemplate.updateMulti(new Query(Criteria.where("townId").is(townId)),Update.update("townName",townName),"measurement");
     }
 
     public List<Measurement> getAllMeasurements(){
+        logger.info("Loading all measurements.");
         return measurementRepository.findAll();
     }
 

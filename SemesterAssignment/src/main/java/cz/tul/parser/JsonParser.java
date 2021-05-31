@@ -1,12 +1,18 @@
 package cz.tul.parser;
 
+import cz.tul.Main;
 import cz.tul.data.Measurement;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
 public class JsonParser {
+
+    private static final Logger logger = LoggerFactory.getLogger(JsonParser.class);
+
     public ArrayList<Measurement> getMeasurementsFromJson(StringBuilder string){
         try {
             ArrayList<Measurement> measurements = new ArrayList<>();
@@ -36,15 +42,12 @@ public class JsonParser {
                 Measurement measurement = new Measurement(townId,ts.longValue(),main,description,temperature,feelsLike,maxTemperature,minTemperature,pressure,humidity,windSpeed,windDegree,townName,countryCode);
                 measurements.add(measurement);
             }
+            logger.info(measurements.size() + " measurements parsed from input string.");
             return measurements;
         }catch (Exception e){
-
+            logger.error("Unexpected format of input.");
         }
       return null;
     }
-    //TODO read only mode
-    //TODO logovani
     //TODO testy
-    //TODO samostatne spustitelna aplikace
-    //TODO externi zmena properties souboru
 }

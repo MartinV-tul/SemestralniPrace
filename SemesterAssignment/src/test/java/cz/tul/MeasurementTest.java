@@ -6,6 +6,7 @@ import cz.tul.parser.JsonParser;
 import cz.tul.service.MeasurementService;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -15,10 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,16 +34,21 @@ public class MeasurementTest {
     private Measurement measurement3 = new Measurement(3067696,1622050367L,"Clouds","overcast clouds",3.97,11.34,12.28,10.66,1014,81,5,221,"prague","CZ");
     private Measurement measurement4 = new Measurement(3067696,1621550366L,"Clouds","overcast clouds",8.97,11.34,12.28,10.66,1014,81,5,221,"prague","CZ");
     private Measurement measurement5 = new Measurement(3067696,1621050365L,"Clouds","overcast clouds",20.97,11.34,12.28,10.66,1014,81,5,221,"prague","CZ");
-    private Measurement measurement6 = new Measurement(3078610,1622050364L,"Clouds","overcast clouds",7.97,11.34,12.28,10.66,1014,81,5,221,"brno","CZ");
-    private Measurement measurement7 = new Measurement(3078610,1622050363L,"Clouds","overcast clouds",9.97,11.34,12.28,10.66,1014,81,5,221,"brno","CZ");
+    private Measurement measurement6 = new Measurement(3078610,1622050364L,"Clouds","overcast clouds",7.97,11.34,12.28,10.66,1014,81,5,221,"bratislava","SK");
+    private Measurement measurement7 = new Measurement(3078610,1622050363L,"Clouds","overcast clouds",9.97,11.34,12.28,10.66,1014,81,5,221,"bratislava","SK");
 
     @Before
     public void init(){
-        //measurementService.deleteAllMeasurements();
+        measurementService.deleteAllMeasurements();
+    }
+
+    @After
+    public void clearDatabase(){
+        measurementService.deleteAllMeasurements();
     }
 
     @Test
-    public void testSave(){
+    public void testSaveGetDelete(){
         List<Measurement> measurements = new ArrayList<>();
         measurements.add(measurement1);
         measurements.add(measurement2);
@@ -60,6 +62,20 @@ public class MeasurementTest {
 
         List<Measurement> measurements1 = measurementService.getAllMeasurements();
         assertEquals("Seven measurements should have been saved and retrieved",7,measurements1.size());
+        List<Measurement> measurements2 = measurementService.getAllMeasurementsOfCountry("CZ");
+        assertEquals("Five measurements should have been retrieved",5,measurements2.size());
+        List<Measurement> measurements3 = measurementService.getAllMeasurementsOfTown(measurement6.getTownId());
+        assertEquals("Two measurements should have been retrieved",2,measurements3.size());
+
+        measurementService.deleteAllMeasurementsOfTown(measurement1.getTownId());
+        List<Measurement> measurements4 = measurementService.getAllMeasurements();
+        assertEquals("Two measurements should have been retrieved",2,measurements4.size());
+
+        measurementService.saveMeasurement(measurement1);
+
+        measurementService.deleteAllMeasurementsOfCountry("SK");
+        List<Measurement> measurements5 = measurementService.getAllMeasurements();
+        assertEquals("One measurement should have been retrieved",1,measurements5.size());
 
     }
 
@@ -73,16 +89,21 @@ public class MeasurementTest {
         measurements.add(measurement5);
         measurements.add(measurement6);
         measurements.add(measurement7);
-
         measurementService.saveAllMeasurements(measurements);
-
-        double d = measurementService.oneDayAverage(1622050364L,3077929);
-        System.out.println(d);
+        double oneDayAverage = measurementService.oneDayAverage(measurement1.getTs(),measurement1.getTownId());
+        double oneWeekAverage = measurementService.oneWeekAverage(measurement1.getTs(),measurement1.getTownId());
+        double twoWeeksAverage = measurementService.twoWeeksAverage(measurement1.getTs(),measurement1.getTownId());
+        assertEquals(7.3,oneDayAverage,0.01);
+        assertEquals(7.72,oneWeekAverage,0.01);
+        assertEquals(10.37,twoWeeksAverage,0.01);
     }
 
     @Test
     public void testChangeTownNameOfMeasurement(){
-        measurementService.updateTownNameOfMeasurement("Prague",3067696);
+        measurementService.saveMeasurement(measurement1);
+        measurementService.updateTownNameOfMeasurement("Praha",measurement1.getTownId());
+        List<Measurement> measurements = measurementService.getAllMeasurementsOfTown(measurement1.getTownId());
+        assertEquals("Name of measurements should be changed","Praha",measurements.get(0).getTownName());
     }
 
     @Test
@@ -102,11 +123,5 @@ public class MeasurementTest {
         List<Measurement> measurements1 = measurementService.getAllMeasurements();
         assertEquals("One measurement should have expired",0,measurements1.size());
         measurementService.changeExpirationTime(1209600);
-    }
-
-    @Test
-    public void testMeasurementToString(){
-        String s = measurement1.toString();
-        System.out.println(s);
     }
 }

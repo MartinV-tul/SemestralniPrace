@@ -25,26 +25,25 @@ public class TownTest {
     @Autowired
     private TownService townService;
 
-    private static Country country1 = new Country("CZ","Česká Republika");
-    private static Country country2 = new Country("SK","Slovensko");
+    private static Country country1 = new Country("CZ","Czech Republic");
+    private static Country country2 = new Country("SK","Slovakia");
 
-    private Town town1 = new Town(1,"Praha",country1);
+    private Town town1 = new Town(1,"Prague",country1);
     private Town town2 = new Town(2,"Brno",country1);
     private Town town3 = new Town(3,"Liberec",country1);
 
     private Town town4 = new Town(4,"Bratislava",country2);
-    private Town town5 = new Town(5,"Košice",country2);
-    private Town town6 = new Town(6,"Trenčín",country2);
+    private Town town5 = new Town(5,"Kosice",country2);
+    private Town town6 = new Town(6,"Trencín",country2);
 
     public void init(){
         countryService.deleteAllCountries();
     }
 
     @Test
-    public void testGetByCountry(){
+    public void testSaveGetAndDelete(){
         countryService.saveOrUpdate(country1);
         countryService.saveOrUpdate(country2);
-
         townService.saveOrUpdate(town1);
         townService.saveOrUpdate(town2);
         townService.saveOrUpdate(town3);
@@ -52,46 +51,37 @@ public class TownTest {
         townService.saveOrUpdate(town5);
         townService.saveOrUpdate(town6);
 
-        List<Town> towns1 = townService.getTowns();
-        assertEquals("Should be six retrieved towns.", 6, towns1.size());
-        List<Town> towns2 = townService.getTownsByCountryCode(country1.getCode());
-        assertEquals("Should be three retrieved towns.", 3, towns2.size());
-        List<Town> towns3 = townService.getTownsByCountryCode(country2.getCode());
-        assertEquals("Should be three retrieved towns.", 3, towns3.size());
+        List<Town> towns = townService.getTowns();
+        assertEquals("Six towns should have been saved a retrieved.",6,towns.size());
+        List<Town> towns1 = townService.getTownsByCountryCode(country1.getCode());
+        assertEquals("Three towns should have been retrieved.",3,towns1.size());
+        townService.deleteByCountryCode(country2.getCode());
+        List<Town> towns2 = townService.getTowns();
+        assertEquals("Three towns should have been retrieved.",3,towns2.size());
+        townService.deleteTownById(town1.getId());
+        assertEquals("Country should not exist.",false,townService.exists(town1.getId()));
+        townService.deleteAllTowns();
+        List<Town> towns3 = townService.getTowns();
+        assertEquals("All towns should be deleted",0,towns3.size());
 
-        assertEquals("Should be country1.", country1, towns2.get(0).getCountry());
-        assertEquals("Should be country1.", country1, towns2.get(1).getCountry());
-        assertEquals("Should be country1.", country1, towns2.get(2).getCountry());
-
-        assertEquals("Should be country2.", country2, towns3.get(0).getCountry());
-        assertEquals("Should be country2.", country2, towns3.get(1).getCountry());
-        assertEquals("Should be country2.", country2, towns3.get(2).getCountry());
     }
 
     @Test
-    public void testDelete(){
+    public void testUpdate(){
         countryService.saveOrUpdate(country1);
-        countryService.saveOrUpdate(country2);
-
         townService.saveOrUpdate(town1);
-        townService.saveOrUpdate(town2);
-        townService.saveOrUpdate(town3);
-        townService.saveOrUpdate(town4);
-        townService.saveOrUpdate(town5);
-        townService.saveOrUpdate(town6);
+        town1.setName("Praha");
+        townService.saveOrUpdate(town1);
+        List<Town> towns = townService.getTowns();
+        assertEquals("Name of country should have been changed.",town1.getName(),towns.get(0).getName());
+        town1.setName("Prague");
+    }
 
-        townService.deleteTown(town4);
-
-        List<Town> towns1 = townService.getTowns();
-        assertEquals("Should be five retrieved towns.", 5, towns1.size());
-        List<Town> towns2 = townService.getTownsByCountryCode(country1.getCode());
-        assertEquals("Should be three retrieved towns.", 3, towns2.size());
-        List<Town> towns3 = townService.getTownsByCountryCode(country2.getCode());
-        assertEquals("Should be two retrieved towns.", 2, towns3.size());
-
-        townService.deleteByCountryCode(country2.getCode());
-        List<Town> towns4 = townService.getTowns();
-        assertEquals("Should be three retrieved towns.", 3, towns4.size());
+    @Test
+    public void testExists(){
+        countryService.saveOrUpdate(country1);
+        townService.saveOrUpdate(town1);
+        assertEquals("Country should exist.",true,townService.exists(town1.getId()));
     }
 
 }

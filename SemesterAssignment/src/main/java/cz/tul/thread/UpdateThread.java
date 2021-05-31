@@ -6,6 +6,7 @@ import cz.tul.parser.JsonParser;
 import cz.tul.service.MeasurementService;
 import cz.tul.service.TownService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 
 import java.io.BufferedReader;
@@ -23,6 +24,7 @@ public class UpdateThread extends Thread{
         this.measurementService = measurementService;
         this.townService = townService;
     }
+
 
     private final TownService townService;
 

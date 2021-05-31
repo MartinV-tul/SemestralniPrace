@@ -1,18 +1,24 @@
 package cz.tul.parser;
 
 import cz.tul.data.Measurement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CSVParser {
+
+    private static final Logger logger = LoggerFactory.getLogger(CSVParser.class);
+
     public StringBuilder createCSV(List<Measurement> measurements){
         StringBuilder csv = new StringBuilder("_class,_id,countryCode,createdAt,description,feelsLike,humidity,main,maximalTemperature,minimalTemperature,pressure,temperature,townId,townName,ts,windDegree,windSpeed");
         for (Measurement measurement:measurements) {
             csv.append("\n");
             csv.append(measurement.toString());
         }
+        logger.info("CSV file from measurements created.");
         return csv;
     }
 
@@ -23,7 +29,10 @@ public class CSVParser {
             while (reader.ready()){
                 String line = reader.readLine();
                 String[] lines = line.split(",");
-                if(lines.length != 17) return measurements;
+                if(lines.length != 17) {
+                    logger.error("Unexpected number of values in line.");
+                    break;
+                }
                 String code = lines[2];
                 String description = lines[4];
                 Double feelsLike = Double.parseDouble(lines[5]);
@@ -41,9 +50,11 @@ public class CSVParser {
                 Measurement measurement = new Measurement(townId,ts,main,description,temp,feelsLike,maxTemp,minTemp,pressure,humidity,windSpeed,windDegree,townName,code);
                 measurements.add(measurement);
             }
+            logger.info(measurements.size() + "measurements parsed from input.");
             return measurements;
         }catch (Exception e){
-            return null;
+            logger.error("Error occurred during parsing input file. Number of successfully parsed measurements: "+measurements.size());
+           return measurements;
         }
     }
 

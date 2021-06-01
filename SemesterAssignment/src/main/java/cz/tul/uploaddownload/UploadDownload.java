@@ -1,9 +1,7 @@
 package cz.tul.uploaddownload;
 
 import cz.tul.controller.AppController;
-import cz.tul.data.Country;
 import cz.tul.data.Measurement;
-import cz.tul.data.Town;
 import cz.tul.parser.CSVParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;

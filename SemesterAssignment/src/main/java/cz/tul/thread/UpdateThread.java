@@ -5,9 +5,6 @@ import cz.tul.data.Town;
 import cz.tul.parser.JsonParser;
 import cz.tul.service.MeasurementService;
 import cz.tul.service.TownService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.ComponentScan;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -17,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateThread extends Thread{
+
     public static Integer updateTime = 5000;
     boolean updateEnabled = true;
 

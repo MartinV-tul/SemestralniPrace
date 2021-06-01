@@ -1,6 +1,5 @@
 package cz.tul.parser;
 
-import cz.tul.Main;
 import cz.tul.data.Measurement;
 import org.json.JSONArray;
 import org.json.JSONObject;
